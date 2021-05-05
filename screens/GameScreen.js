@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { Text, View, StyleSheet, Button, Alert } from "react-native";
 import NumberContainer from "../components/NumberContainer";
 import Card from "../components/Card";
@@ -22,6 +22,16 @@ const GameScreen = (props) => {
 
   const currentLow = useRef(1);
   const currentHigh = useRef(100);
+  const [rounds, setRounds] = useState(0);
+
+  //object destructuring
+  const { userChoice, onGameOver } = props;
+  useEffect(() => {
+    if (currentGuess === props.userChoice) {
+      //fire a game is over msg
+      onGameOver(rounds);
+    }
+  }, [currentGuess, userChoice, onGameOver]);
 
   const nextGuessHandler = (direction) => {
     if (
@@ -46,6 +56,7 @@ const GameScreen = (props) => {
       currentGuess
     );
     setCurrentGuess(nextNum);
+    setRounds((rounds) => rounds + 1);
   };
 
   return (
