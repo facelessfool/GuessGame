@@ -1,7 +1,16 @@
 import React, { useState, useRef, useEffect } from "react";
-import { Text, View, StyleSheet, Button, Alert } from "react-native";
+import {
+  Text,
+  View,
+  StyleSheet,
+  Button,
+  Alert,
+  ScrollView,
+} from "react-native";
 import NumberContainer from "../components/NumberContainer";
 import Card from "../components/Card";
+import MyButton from "../components/MyButton";
+import { Ionicons } from "@expo/vector-icons";
 
 const generateRandomBetween = (min, max, exclude) => {
   min = Math.ceil(min);
@@ -16,20 +25,22 @@ const generateRandomBetween = (min, max, exclude) => {
 };
 
 const GameScreen = (props) => {
-  const [currentGuess, setCurrentGuess] = useState(
-    generateRandomBetween(1, 100, props.userChoice)
-  );
+  // console.log("props in gamescreen", props);
+
+  const initialGuess = generateRandomBetween(1, 100, props.userChoice);
+  const [currentGuess, setCurrentGuess] = useState(initialGuess);
 
   const currentLow = useRef(1);
   const currentHigh = useRef(100);
-  const [rounds, setRounds] = useState(0);
+  const [pastGuesses, setPastGuesses] = useState([initialGuess]);
 
-  //object destructuring
+  //object destructuring froms the props sent by App.js
   const { userChoice, onGameOver } = props;
   useEffect(() => {
     if (currentGuess === props.userChoice) {
       //fire a game is over msg
-      onGameOver(rounds);
+      const n = pastGuesses.length;
+      onGameOver(n);
     }
   }, [currentGuess, userChoice, onGameOver]);
 
@@ -47,7 +58,7 @@ const GameScreen = (props) => {
     if (direction === "lower") {
       currentHigh.current = currentGuess;
     } else if (direction === "higher") {
-      currentLow.current = currentGuess;
+      currentLow.current = currentGuess + 1;
     }
 
     const nextNum = generateRandomBetween(
@@ -56,7 +67,7 @@ const GameScreen = (props) => {
       currentGuess
     );
     setCurrentGuess(nextNum);
-    setRounds((rounds) => rounds + 1);
+    setPastGuesses((curPastGuesses) => [nextNum, ...curPastGuesses]);
   };
 
   return (
@@ -64,12 +75,25 @@ const GameScreen = (props) => {
       <Text>Opponent's Guess</Text>
       <NumberContainer>{currentGuess}</NumberContainer>
       <Card style={styles.container}>
-        <Button title="LOWER" onPress={nextGuessHandler.bind(this, "lower")} />
+        <MyButton onClick={nextGuessHandler.bind(this, "lower")}>
+          <Ionicons name="remove" size={24} color="white" />
+        </MyButton>
+        <MyButton onClick={nextGuessHandler.bind(this, "higher")}>
+          <Ionicons name="add" size={24} color="white" />
+        </MyButton>
+        {/* <Button title="LOWER" onPress={nextGuessHandler.bind(this, "lower")} />
         <Button
           title="HIGHER"
           onPress={nextGuessHandler.bind(this, "higher")}
-        />
+        /> */}
       </Card>
+      <ScrollView>
+        {pastGuesses.map((guess) => (
+          <View key={guess}>
+            <Text>{guess}</Text>
+          </View>
+        ))}
+      </ScrollView>
     </View>
   );
 };
@@ -82,6 +106,10 @@ const styles = StyleSheet.create({
   },
   container: {
     flexDirection: "row",
+    justifyContent: "space-around",
+    marginTop: 20,
+    width: 300,
+    maxWidth: "90%",
   },
 });
 

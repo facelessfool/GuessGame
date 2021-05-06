@@ -5,7 +5,7 @@ import Colors from "../constants/colors";
 const Header = (props) => {
   return (
     <View style={styles.titleStyle}>
-      <Text>{props.title}</Text>
+      <Text style={styles.title}>{props.title}</Text>
     </View>
   );
 };
@@ -20,6 +20,10 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     backgroundColor: Colors.primary,
+  },
+  title: {
+    fontFamily: "open-sans-bold",
+    fontSize: 18,
   },
 });
 
